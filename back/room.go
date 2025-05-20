@@ -41,38 +41,46 @@ func main() {
 	// テーブル作成（なければ）
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS rooms (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        room_id TEXT UNIQUE
+        room_id TEXT UNIQUE,
+        snack1 TEXT,
+        snack2 TEXT
     )`)
 	if err != nil {
 		panic(err)
 	}
 
 	http.HandleFunc("/api/create-room", func(w http.ResponseWriter, r *http.Request) {
-		// ランダムなルームIDを生成
-		roomID := generateRoomID()
-		for {
-			var exists bool
-			err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM rooms WHERE room_id = ?)", roomID).Scan(&exists)
-			if err != nil {
-				http.Error(w, "db error", http.StatusInternalServerError)
-				return
-			}
-			if !exists {
-				break
-			}
-			roomID = generateRoomID() // 重複していたら再生成
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
 		}
 
-		// DBに保存
-		_, err := db.Exec("INSERT INTO rooms (room_id) VALUES (?)", roomID)
+		var req CheckRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "invalid request", http.StatusBadRequest)
+			return
+		}
+		// 重複チェック
+		var exists bool
+		err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM rooms WHERE room_id = ?)", req.RoomID).Scan(&exists)
+		if err != nil {
+			http.Error(w, "db error", http.StatusInternalServerError)
+			return
+		}
+		if exists {
+			http.Error(w, "room id already exists", http.StatusConflict)
+			return
+		}
+		// 登録
+		_, err = db.Exec("INSERT INTO rooms (room_id) VALUES (?)", req.RoomID)
 		if err != nil {
 			http.Error(w, "failed to create room", http.StatusInternalServerError)
 			return
 		}
-
-		fmt.Println("Room ID created:", roomID)
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{"roomId": roomID})
+		json.NewEncoder(w).Encode(map[string]string{"roomId": req.RoomID})
 	})
 
 	http.ListenAndServe(":8080", nil)

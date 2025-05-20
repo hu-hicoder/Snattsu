@@ -1,11 +1,13 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation"; // 追加
 
 export default function Home() {
   const [roomId, setRoomId] = useState("");
   const [mode, setMode] = useState<"join" | "create" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter(); // 追加
 
   // ルームID作成（APIでID作成）
   const handleCreateRoom = async () => {
@@ -20,6 +22,7 @@ export default function Home() {
         const data = await res.json();
         setRoomId(data.roomId); // バックエンドから取得したルームIDを設定
         setMode("create");
+        router.push(`/set_snacks/${data.roomId}`); // ここで遷移
       } else if (res.status === 409) {
         setError("ルームIDが重複しました。もう一度お試しください。");
       } else {
@@ -45,6 +48,7 @@ export default function Home() {
       const data = await res.json();
       if (data.exists) {
         setMode("join");
+        router.push(`/set_snacks/${roomId}`); // ここで遷移
       } else {
         setError("そのルームIDは存在しません。");
       }
