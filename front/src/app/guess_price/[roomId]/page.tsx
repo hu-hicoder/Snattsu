@@ -1,7 +1,6 @@
 "use client";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 export default function GuessPrice() {
   const router = useRouter();
@@ -10,29 +9,66 @@ export default function GuessPrice() {
   const roomId = params.roomId as string;
   const members = Number(searchParams.get("members") || 1);
   const current = Number(searchParams.get("current") || 1);
+  const team = searchParams.get("team") || "A"; // チーム名をクエリから取得（なければ"A"）
 
+  // JSON形式で保存・取得
+  const [inputData, setInputData] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(`guess_input_${roomId}_${team}`);
+      return saved
+        ? JSON.parse(saved)
+        : {
+            roomId,
+            team,
+            number: members,
+            guesses: [],
+          };
+    }
+    return {
+      roomId,
+      team,
+      number: members,
+      guesses: [],
+    };
+  });
   const [price, setPrice] = useState("");
 
-  // 価格入力欄の初期化
+  // ページ切り替え時に入力欄を初期化
   useEffect(() => {
-      setPrice("");
+    setPrice("");
   }, [current]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // inputDataが変わるたびにlocalStorageに保存
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        `guess_input_${roomId}_${team}`,
+        JSON.stringify(inputData)
+      );
+    }
+  }, [inputData, roomId, team]);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // 価格予想をバックエンドに送信
-    await fetch("http://localhost:8080/api/guess-price", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ roomId, user: current, price }),
-    });
+    const nextGuesses = [...inputData.guesses];
+    nextGuesses[current - 1] = Number(price);
+
+    const newInputData = {
+      ...inputData,
+      guesses: nextGuesses,
+    };
+    setInputData(newInputData);
 
     if (current < members) {
       // 次の人の入力ページへ
-      router.replace(`/guess_price/${roomId}?members=${members}&current=${current + 1}`);
+      const team = searchParams.get("team") || "A"; // チーム名をクエリから取得（なければ"A"）
+      router.replace(
+        `/guess_price/${roomId}?members=${members}&current=${current + 1}&team=${team}`
+      );
     } else {
       // 全員分入力が終わったら結果ページなどへ
-      router.push(`/result/${roomId}`);
+      alert("入力データ: " + JSON.stringify(newInputData, null, 2));
+      // 例: router.push(`/result/${roomId}`); など
     }
   };
 

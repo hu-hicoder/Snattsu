@@ -65,56 +65,26 @@ func RegisterRoomAPI(db *sql.DB) {
 		json.NewEncoder(w).Encode(map[string]string{"roomId": roomID})
 	})
 
-	http.HandleFunc("/api/set-snack", func(w http.ResponseWriter, r *http.Request) {
+	// ルーム存在チェックAPI
+	http.HandleFunc("/api/check-room", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-
-		var req SnackRequest
+		var req CheckRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "invalid request", http.StatusBadRequest)
 			return
 		}
-
-		// snack1が空ならsnack1、そうでなければsnack2に格納
-		var snack1 string
-		err := db.QueryRow("SELECT snack1 FROM rooms WHERE room_id = ?", req.RoomID).Scan(&snack1)
+		var exists bool
+		err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM rooms WHERE room_id = ?)", req.RoomID).Scan(&exists)
 		if err != nil {
-			http.Error(w, "room not found", http.StatusNotFound)
+			http.Error(w, "db error", http.StatusInternalServerError)
 			return
 		}
-
-		var query string
-		if snack1 == "" {
-			query = "UPDATE rooms SET snack1 = ? WHERE room_id = ?"
-		} else {
-			query = "UPDATE rooms SET snack2 = ? WHERE room_id = ?"
-		}
-
-		_, err = db.Exec(query, req.Snack, req.RoomID)
-		if err != nil {
-			http.Error(w, "failed to update snack", http.StatusInternalServerError)
-			return
-		}
-
-		w.WriteHeader(http.StatusOK)
-	})
-
-	http.HandleFunc("/api/get-snacks", func(w http.ResponseWriter, r *http.Request) {
-		roomId := r.URL.Query().Get("roomId")
-		var snack1, snack2 string
-		err := db.QueryRow("SELECT snack1, snack2 FROM rooms WHERE room_id = ?", roomId).Scan(&snack1, &snack2)
-		if err != nil {
-			http.Error(w, "room not found", http.StatusNotFound)
-			return
-		}
-		json.NewEncoder(w).Encode(map[string]string{
-			"snack1": snack1,
-			"snack2": snack2,
-		})
+		json.NewEncoder(w).Encode(CheckResponse{Exists: exists})
 	})
 
 	// 他のエンドポイントもここで登録できます

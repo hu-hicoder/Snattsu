@@ -1,17 +1,19 @@
 "use client";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export default function InputMembers() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const roomId = params.roomId as string;
   const [members, setMembers] = useState(2);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // 必要ならバックエンドに人数を保存
-    router.push(`/guess_price/${roomId}?members=${members}&current=1`);
+    const team = searchParams.get("team") || "A"; // チーム名をクエリから取得（なければ"A"）
+    router.push(`/guess_price/${roomId}?members=${members}&current=1&team=${encodeURIComponent(team)}`);
   };
 
   return (

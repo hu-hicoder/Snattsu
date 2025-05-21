@@ -20,8 +20,18 @@ export default function Home() {
 
   // 自動生成で作成
   const handleAutoCreate = async () => {
-    const newId = generateRoomId();
-    await handleCreateRoom(newId);
+    setError(null);
+    const res = await fetch("http://localhost:8080/api/create-room", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setRoomId(data.roomId); // ← ここで返ってきたIDを使う
+      router.push(`/set_snacks/${data.roomId}`);
+    } else {
+      setError("ルーム作成に失敗しました。");
+    }
   };
 
   // 手入力で作成
