@@ -21,6 +21,7 @@ func main() {
 	// API登録
 	api.RegisterRoomAPI(db)
 	api.RegisterGuessAPI(db)
+	api.RegisterSyncAPI()
 
 	fmt.Println("Starting server on :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {

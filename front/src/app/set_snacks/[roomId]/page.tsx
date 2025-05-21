@@ -8,18 +8,12 @@ export default function SetSnacks() {
   const params = useParams();
   const roomId = params.roomId as string;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!snack.trim()) return;
 
-    // お菓子名のみバックエンドに送信
-    await fetch("http://localhost:8080/api/set-snack", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ roomId, snack }),
-    });
-    console.log(roomId)
-    router.push(`/input_members/${roomId}`);
+    // 入力したお菓子名をteamとして次ページに渡す
+    router.push(`/input_members/${roomId}?team=${encodeURIComponent(snack)}`);
   };
 
   return (

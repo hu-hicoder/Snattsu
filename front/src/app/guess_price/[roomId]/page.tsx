@@ -1,7 +1,6 @@
 "use client";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 export default function GuessPrice() {
   const router = useRouter();
@@ -10,13 +9,25 @@ export default function GuessPrice() {
   const roomId = params.roomId as string;
   const members = Number(searchParams.get("members") || 1);
   const current = Number(searchParams.get("current") || 1);
+  const team = searchParams.get("team") || "A"; // ← 追加
 
   const [price, setPrice] = useState("");
+  const [inputData, setInputData] = useState<{ guesses: number[] }>({ guesses: [] }); // ← 追加
 
   // 価格入力欄の初期化
   useEffect(() => {
-      setPrice("");
+    setPrice("");
   }, [current]);
+
+  // inputDataが変わるたびにlocalStorageに保存
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        `guess_input_${roomId}_${team}`,
+        JSON.stringify(inputData)
+      );
+    }
+  }, [inputData, roomId, team]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,12 +38,22 @@ export default function GuessPrice() {
       body: JSON.stringify({ roomId, user: current, price }),
     });
 
+    // 入力データを更新
+    const nextGuesses = [...inputData.guesses];
+    nextGuesses[current - 1] = Number(price);
+    setInputData({ guesses: nextGuesses });
+
     if (current < members) {
       // 次の人の入力ページへ
-      router.replace(`/guess_price/${roomId}?members=${members}&current=${current + 1}`);
+      router.replace(`/guess_price/${roomId}?members=${members}&current=${current + 1}&team=${team}`);
     } else {
-      // 全員分入力が終わったら結果ページなどへ
-      router.push(`/result/${roomId}`);
+      // 全員分入力が終わったら「待機ページ」へ遷移し、完了フラグを送信
+      await fetch("http://localhost:8080/api/finish-guess", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roomId, team }),
+      });
+      router.push(`/wait/${roomId}/${team}`);
     }
   };
 
