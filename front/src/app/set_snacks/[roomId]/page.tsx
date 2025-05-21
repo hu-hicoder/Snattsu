@@ -1,27 +1,31 @@
 "use client";
-import Link from 'next/link'
+import { useRouter, useParams } from "next/navigation";
 import { useState } from "react";
 
 export default function SetSnacks() {
   const [snack, setSnack] = useState("");
-  const [snacks, setSnacks] = useState<string[]>([]);
+  const router = useRouter();
+  const params = useParams();
+  const roomId = params.roomId as string;
 
-  const handleAddSnack = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (snack.trim() !== "") {
-      setSnacks([...snacks, snack]);
-      setSnack("");
-    }
-  };
+    if (!snack.trim()) return;
 
-  const handleRemoveSnack = (index: number) => {
-    setSnacks(snacks.filter((_, i) => i !== index));
+    // お菓子名のみバックエンドに送信
+    await fetch("http://localhost:8080/api/set-snack", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ roomId, snack }),
+    });
+    console.log(roomId)
+    router.push(`/input_members/${roomId}`);
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8 gap-16">
-      <h1 className="text-2xl font-bold mb-4">お菓子を選択</h1>
-      <form onSubmit={handleAddSnack} className="flex gap-2 mb-4">
+    <div className="flex flex-col items-center justify-center min-h-screen p-8 gap-8">
+      <h1 className="text-2xl font-bold mb-4">お菓子を入力</h1>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 items-center">
         <input
           type="text"
           className="border rounded px-2 py-1 flex-1"
@@ -31,27 +35,12 @@ export default function SetSnacks() {
         />
         <button
           type="submit"
-          className="bg-blue-600 text-white rounded px-4 py-1 font-semibold hover:bg-blue-700 transition"
+          className="bg-green-600 text-white rounded px-4 py-2 font-semibold hover:bg-green-700 transition"
+          disabled={!snack.trim()}
         >
-          追加
+          次へ
         </button>
       </form>
-      <ul className="list-disc list-inside mb-4">
-        {snacks.map((s, index) => (
-          <li key={index} className="flex justify-between items-center">
-            {s}
-            <button
-              onClick={() => handleRemoveSnack(index)}
-              className="ml-2 text-red-600 hover:text-red-800"
-            >
-              削除
-            </button>
-          </li>
-        ))}
-      </ul>
-      <Link href="/room" className="bg-green-600 text-white rounded px-4 py-2 font-semibold hover:bg-green-700 transition">
-        次へ
-      </Link>
     </div>
   );
 }
