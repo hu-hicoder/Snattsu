@@ -34,5 +34,20 @@ func InitDB() (*sql.DB, error) {
 		return nil, err
 	}
 
+	// pricesテーブル作成
+	_, err = db.Exec(`CREATE TABLE prices (
+    id INTEGER PRIMARY KEY,
+    price REAL NOT NULL
+	);`)
+	if err != nil {
+		return nil, err
+	}
+
+	// とりあえずテストデータを挿入
+	_, err = db.Exec(`INSERT INTO prices (price) VALUES (100);`)
+	if err != nil {
+		return nil, err
+	}
+
 	return db, nil
 }

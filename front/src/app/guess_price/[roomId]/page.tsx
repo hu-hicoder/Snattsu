@@ -63,24 +63,34 @@ export default function GuessPrice() {
       // 次の人の入力ページへ
       const team = searchParams.get("team") || "A"; // チーム名をクエリから取得（なければ"A"）
       router.replace(
-        `/guess_price/${roomId}?members=${members}&current=${current + 1}&team=${team}`
+        `/guess_price/${roomId}?members=${members}&current=${
+          current + 1
+        }&team=${team}`
       );
     } else {
-      // 全員分入力が終わったら結果ページなどへ
-      alert("入力データ: " + JSON.stringify(newInputData, null, 2));
-      // 例: router.push(`/result/${roomId}`); など
+      // 全員分入力が終わったら結果ページへ
+      const productId = 1; // 仮に商品IDを1とする
+      const guesses = (newInputData.guesses as string[])
+        .map((guess) => `guesses=${encodeURIComponent(guess)}`)
+        .join("&");
+      router.push(
+        `/result/${roomId}?members=${members}&team=${team}&productId=${productId}&${guesses}`
+      );
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 gap-8">
       <h1 className="text-2xl font-bold mb-4">{current}人目の小売価格予想</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 items-center">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4 items-center"
+      >
         <input
           type="number"
           min={1}
           value={price}
-          onChange={e => setPrice(e.target.value)}
+          onChange={(e) => setPrice(e.target.value)}
           className="border rounded px-2 py-1 w-32 text-center"
           placeholder="予想価格（円）"
         />
