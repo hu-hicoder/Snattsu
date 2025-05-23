@@ -9,12 +9,32 @@ export default function GuessPrice() {
   const roomId = params.roomId as string;
   const members = Number(searchParams.get("members") || 1);
   const current = Number(searchParams.get("current") || 1);
-  const team = searchParams.get("team") || "A"; // ← 追加
+  const team = searchParams.get("team") || "A"; // チーム名をクエリから取得（なければ"A"）
 
+  // JSON形式で保存・取得
+  const [inputData, setInputData] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(`guess_input_${roomId}_${team}`);
+      return saved
+        ? JSON.parse(saved)
+        : {
+            roomId,
+            team,
+            number: members,
+            guesses: [],
+          };
+    }
+    return {
+      roomId,
+      team,
+      number: members,
+      guesses: [],
+    };
+  });
   const [price, setPrice] = useState("");
   const [inputData, setInputData] = useState<{ guesses: number[] }>({ guesses: [] }); // ← 追加
 
-  // 価格入力欄の初期化
+  // ページ切り替え時に入力欄を初期化
   useEffect(() => {
     setPrice("");
   }, [current]);
@@ -31,12 +51,14 @@ export default function GuessPrice() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 価格予想をバックエンドに送信
-    await fetch("http://localhost:8080/api/guess-price", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ roomId, user: current, price }),
-    });
+    const nextGuesses = [...inputData.guesses];
+    nextGuesses[current - 1] = Number(price);
+
+    const newInputData = {
+      ...inputData,
+      guesses: nextGuesses,
+    };
+    setInputData(newInputData);
 
     // 入力データを更新
     const nextGuesses = [...inputData.guesses];

@@ -27,7 +27,7 @@ export default function Home() {
     });
     if (res.ok) {
       const data = await res.json();
-      setRoomId(data.roomId);
+      setRoomId(data.roomId); // ← ここで返ってきたIDを使う
       router.push(`/set_snacks/${data.roomId}`);
     } else {
       setError("ルーム作成に失敗しました。");
