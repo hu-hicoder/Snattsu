@@ -47,8 +47,12 @@ export default function Result() {
         const result: ResultResponse = await response.json();
         setData(result);
 
+        // averageError を加算して保存
+        const previous = Number(localStorage.getItem("averageError")) || 0;
+        const updated = previous + result.averageError;
+
         // localStorage に保存
-        localStorage.setItem("averageError", result.averageError.toString());
+        localStorage.setItem("averageError", updated.toString());
 
         // 10秒後にホームに遷移
         setTimeout(() => {
