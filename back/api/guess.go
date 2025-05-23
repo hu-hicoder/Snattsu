@@ -29,9 +29,23 @@ func RegisterGuessAPI(db *sql.DB) {
 			return
 		}
 
+		// 重複チェック
+		var exists int
+		err := db.QueryRow(`SELECT COUNT(*) FROM guesses
+			WHERE room_id = ? AND team = ? AND product_id = ?
+		`, req.RoomID, req.Team, req.ProductID).Scan(&exists)
+		if err != nil {
+			http.Error(w, "database error", http.StatusInternalServerError)
+			return
+		}
+		if exists > 0 {
+			http.Error(w, "already submitted", http.StatusConflict) // 409 Conflict
+			return
+		}
+
 		// 正解の価格をDBに問い合わせ
 		var actualPrice int
-		err := db.QueryRow("SELECT price FROM prices WHERE id = ?", req.ProductID).Scan(&actualPrice)
+		err = db.QueryRow("SELECT price FROM prices WHERE id = ?", req.ProductID).Scan(&actualPrice)
 		if err != nil {
 			http.Error(w, "price not found", http.StatusBadRequest)
 			return
