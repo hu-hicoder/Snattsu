@@ -27,6 +27,7 @@ func InitDB() (*sql.DB, error) {
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS guesses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         room_id TEXT,
+		snack TEXT,
         user INTEGER,
         price INTEGER
     )`)
