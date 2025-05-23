@@ -138,7 +138,7 @@ export default function WaitPage() {
 
       <div>
         <p>ルームID: {roomId}</p>
-        <p>あなたのチーム: {team}</p>
+        <p>あなたのチーム: {decodeURIComponent(team)}</p>
       </div>
     </div>
   );
