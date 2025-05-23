@@ -13,6 +13,12 @@ type CardRequest struct {
 	Card      string `json:"card"`
 }
 
+// Card構造体定義
+type Card struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
 type CardEnum int
 
 // iotaを用いて連番を生成する
@@ -71,10 +77,25 @@ func RegisterCardAPI(db *sql.DB) {
 }
 
 func methodGet(w http.ResponseWriter, r *http.Request) {
+	// cardsマップの作成
+	cards := map[string]Card{
+		Half.String(): {
+			Name:        "ハーフカード",
+			Description: "誤差が半分になる",
+		},
+		Reduce.String(): {
+			Name:        "リデュースカード",
+			Description: "誤差が10を超えても10まで",
+		},
+	}
+
+	// 全体のレスポンス
+	response := map[string]interface{}{
+		"cards": cards,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string][]string{
-		"cards": {Half.String(), Reduce.String()},
-	})
+	json.NewEncoder(w).Encode(response)
 }
 
 func methodPost(w http.ResponseWriter, r *http.Request, db *sql.DB) {
