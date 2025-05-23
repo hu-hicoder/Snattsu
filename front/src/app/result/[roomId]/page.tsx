@@ -52,7 +52,10 @@ export default function Result() {
         const updated = previous + result.averageError;
 
         // localStorage に保存
-        localStorage.setItem("averageError", updated.toString());
+        localStorage.setItem(
+          "averageError_${roomId}_${team}",
+          updated.toString()
+        );
 
         // 10秒後にホームに遷移
         setTimeout(() => {
