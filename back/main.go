@@ -22,6 +22,7 @@ func main() {
 	api.RegisterRoomAPI(db)
 	api.RegisterGuessAPI(db)
 	api.RegisterSyncAPI()
+	api.RegisterCardAPI(db)
 	api.RegisterResultAPI(db)
 
 	fmt.Println("Starting server on :8080")

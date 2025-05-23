@@ -53,7 +53,7 @@ export default function Result() {
 
         // localStorage に保存
         localStorage.setItem(
-          "averageError_${roomId}_${team}",
+          `averageError_${roomId}_${team}`,
           updated.toString()
         );
 
