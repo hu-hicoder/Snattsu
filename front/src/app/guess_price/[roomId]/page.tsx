@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 type InputData = {
   roomId: string;
   team: string;
-  number: number;
+  members: number;
+  productId: number;
   guesses: number[];
 };
 
@@ -17,13 +18,15 @@ export default function GuessPrice() {
   const members = Number(searchParams.get("members") || 1);
   const current = Number(searchParams.get("current") || 1);
   const team = searchParams.get("team") || "A"; // チーム名をクエリから取得（なければ"A"）
+  const productId = 1; // 仮に商品IDを1とする
 
   // JSON形式で保存・取得
   const [inputData, setInputData] = useState<InputData>(() => {
     const data: InputData = {
       roomId,
       team,
-      number: members,
+      members,
+      productId,
       guesses: [],
     };
     if (typeof window !== "undefined") {
@@ -55,7 +58,7 @@ export default function GuessPrice() {
     // 入力データを更新
     const nextGuesses = [...inputData.guesses];
     nextGuesses[current - 1] = Number(price);
-    setInputData({ roomId, team, number: members, guesses: nextGuesses });
+    setInputData({ roomId, team, members, productId, guesses: nextGuesses });
 
     if (current < members) {
       // 次の人の入力ページへ
@@ -66,20 +69,21 @@ export default function GuessPrice() {
       );
     } else {
       // 全員分入力が終わったら結果ページへ
-      const productId = 1; // 仮に商品IDを1とする
-      const guesses = inputData.guesses
-        .map((guess) => `guesses=${encodeURIComponent(guess)}`)
-        .join("&");
-      // router.push(
-      //   `/result/${roomId}?members=${members}&team=${team}&productId=${productId}&${guesses}`
-      // );
+
+      // 価格予想をバックエンドに送信
+      await fetch("http://localhost:8080/api/guess-price", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(inputData),
+      });
+
       // 全員分入力が終わったら「待機ページ」へ遷移し、完了フラグを送信
       await fetch("http://localhost:8080/api/finish-guess", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roomId, team }),
       });
-      router.push(`/wait/${roomId}/${team}`);
+      router.push(`/wait/${roomId}/${team}?productId=${productId}`);
     }
   };
 

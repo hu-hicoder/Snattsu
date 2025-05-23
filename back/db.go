@@ -25,19 +25,20 @@ func InitDB() (*sql.DB, error) {
 
 	// guessesテーブル作成
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS guesses (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER PRIMARY KEY,
         room_id TEXT,
-        user INTEGER,
-        price INTEGER
+				team TEXT,
+				product_id INTEGER,
+        error REAL
     )`)
 	if err != nil {
 		return nil, err
 	}
 
 	// pricesテーブル作成
-	_, err = db.Exec(`CREATE TABLE prices (
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS prices (
     id INTEGER PRIMARY KEY,
-    price REAL NOT NULL
+    price INT NOT NULL
 	);`)
 	if err != nil {
 		return nil, err

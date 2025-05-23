@@ -6,13 +6,11 @@ import { useEffect, useState } from "react";
 type ResultRequest = {
   roomId: string;
   team: string;
-  number: number;
   productId: number;
-  guesses: string[];
 };
 
 type ResultResponse = {
-  roomId: string;
+  winner: string[];
   averageError: number;
 };
 
@@ -21,9 +19,7 @@ export default function Result() {
   const searchParams = useSearchParams();
   const roomId = params.roomId as string;
   const team = searchParams.get("team") || "A";
-  const number = Number(searchParams.get("number")) || 0;
   const productId = Number(searchParams.get("productId"));
-  const guesses = searchParams.getAll("guesses");
 
   const [data, setData] = useState<ResultResponse | null>(null);
 
@@ -32,9 +28,7 @@ export default function Result() {
       const payload: ResultRequest = {
         roomId,
         team,
-        number,
         productId,
-        guesses,
       };
 
       try {
@@ -59,7 +53,7 @@ export default function Result() {
     };
 
     fetchData();
-  }, [roomId, team, number, guesses]);
+  }, [roomId, team, productId]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -67,6 +61,10 @@ export default function Result() {
         <h1 className="text-2xl font-bold text-gray-800 mb-4">結果</h1>
         {data ? (
           <>
+            <p className="text-gray-600 text-lg">
+              Winner:{" "}
+              <span className="font-semibold">{data.winner.join()}</span>
+            </p>
             <p className="text-gray-600 text-lg">
               チーム <span className="font-semibold">{team}</span> の平均誤差：
             </p>

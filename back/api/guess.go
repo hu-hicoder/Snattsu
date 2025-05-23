@@ -7,9 +7,11 @@ import (
 )
 
 type GuessRequest struct {
-	RoomID string `json:"roomId"`
-	User   int    `json:"user"`
-	Price  int    `json:"price"`
+	RoomID    string `json:"roomId"`
+	Team      string `json:"team"`
+	Members   int    `json:"members"`
+	Guesses   []int  `json:"guesses"`
+	ProductID int    `json:"productId"` // ← 単一商品のID
 }
 
 func RegisterGuessAPI(db *sql.DB) {
@@ -27,7 +29,28 @@ func RegisterGuessAPI(db *sql.DB) {
 			return
 		}
 
-		_, err := db.Exec("INSERT INTO guesses (room_id, user, price) VALUES (?, ?, ?)", req.RoomID, req.User, req.Price)
+		// 正解の価格をDBに問い合わせ
+		var actualPrice int
+		err := db.QueryRow("SELECT price FROM prices WHERE id = ?", req.ProductID).Scan(&actualPrice)
+		if err != nil {
+			http.Error(w, "price not found", http.StatusBadRequest)
+			return
+		}
+
+		// 誤差の計算
+		var totalError int
+		for _, guess := range req.Guesses {
+			diff := guess - actualPrice
+			if diff < 0 {
+				diff = -diff
+			}
+			totalError += diff
+		}
+
+		// 誤差の平均
+		averageError := float64(totalError) / float64(len(req.Guesses))
+
+		_, err = db.Exec("INSERT INTO guesses (room_id, team, product_id, error) VALUES (?, ?, ?, ?)", req.RoomID, req.Team, req.ProductID, averageError)
 		if err != nil {
 			http.Error(w, "failed to save guess", http.StatusInternalServerError)
 			return
