@@ -48,20 +48,16 @@ export default function GuessPrice() {
     }
   }, [inputData, roomId, team]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 入力データを更新
     const nextGuesses = [...inputData.guesses];
     nextGuesses[current - 1] = Number(price);
-
-    const newInputData = {
-      ...inputData,
-      guesses: nextGuesses,
-    };
-    setInputData(newInputData);
+    setInputData({ guesses: nextGuesses });
 
     if (current < members) {
       // 次の人の入力ページへ
-      const team = searchParams.get("team") || "A"; // チーム名をクエリから取得（なければ"A"）
       router.replace(
         `/guess_price/${roomId}?members=${members}&current=${
           current + 1
@@ -73,9 +69,16 @@ export default function GuessPrice() {
       const guesses = (newInputData.guesses as string[])
         .map((guess) => `guesses=${encodeURIComponent(guess)}`)
         .join("&");
-      router.push(
-        `/result/${roomId}?members=${members}&team=${team}&productId=${productId}&${guesses}`
-      );
+      // router.push(
+      //   `/result/${roomId}?members=${members}&team=${team}&productId=${productId}&${guesses}`
+      // );
+      // 全員分入力が終わったら「待機ページ」へ遷移し、完了フラグを送信
+      await fetch("http://localhost:8080/api/finish-guess", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roomId, team }),
+      });
+      router.push(`/wait/${roomId}/${team}`);
     }
   };
 
