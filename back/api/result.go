@@ -4,15 +4,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
-	"strconv"
 )
 
 type ResultRequest struct {
-	RoomID    string   `json:"roomId"`
-	Team      string   `json:"team"`
-	Number    int      `json:"number"`
-	Guesses   []string `json:"guesses"`
-	ProductID int      `json:"productId"` // ← 単一商品のID
+	RoomID    string `json:"roomId"`
+	Team      string `json:"team"`
+	Number    int    `json:"number"`
+	Guesses   []int  `json:"guesses"`
+	ProductID int    `json:"productId"` // ← 単一商品のID
 }
 
 func RegisterResultAPI(db *sql.DB) {
@@ -31,7 +30,7 @@ func RegisterResultAPI(db *sql.DB) {
 		}
 
 		// 正解の価格をDBに問い合わせ
-		var actualPrice float64
+		var actualPrice int
 		err := db.QueryRow("SELECT price FROM prices WHERE id = ?", req.ProductID).Scan(&actualPrice)
 		if err != nil {
 			http.Error(w, "price not found", http.StatusBadRequest)
@@ -39,13 +38,8 @@ func RegisterResultAPI(db *sql.DB) {
 		}
 
 		// 誤差の計算
-		var totalError float64
-		for _, guessStr := range req.Guesses {
-			guess, err := strconv.ParseFloat(guessStr, 64)
-			if err != nil {
-				http.Error(w, "invalid guess format", http.StatusBadRequest)
-				return
-			}
+		var totalError int
+		for _, guess := range req.Guesses {
 			diff := guess - actualPrice
 			if diff < 0 {
 				diff = -diff
@@ -54,7 +48,7 @@ func RegisterResultAPI(db *sql.DB) {
 		}
 
 		// 誤差の平均
-		averageError := totalError / float64(len(req.Guesses))
+		averageError := float64(totalError) / float64(len(req.Guesses))
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
