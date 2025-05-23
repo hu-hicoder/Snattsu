@@ -1,12 +1,14 @@
 "use client";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 export default function WaitPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const params = useParams();
   const roomId = params.roomId as string;
   const team = params.team as string;
+  const productId = Number(searchParams.get("productId"));
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -18,7 +20,7 @@ export default function WaitPage() {
       if (res.ok) {
         const data = await res.json();
         if (data.bothFinished) {
-          router.push(`/result/${roomId}`);
+          router.push(`/result/${roomId}?team=${team}&productId=${productId}`);
         }
       }
     }, 2000);
@@ -28,7 +30,9 @@ export default function WaitPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 gap-8">
-      <h2 className="text-xl font-bold mb-4">相手チームの入力を待っています…</h2>
+      <h2 className="text-xl font-bold mb-4">
+        相手チームの入力を待っています…
+      </h2>
       <p>ルームID: {roomId}</p>
       <p>あなたのチーム: {team}</p>
     </div>

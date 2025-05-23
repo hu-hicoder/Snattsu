@@ -2,6 +2,14 @@
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 
+type InputData = {
+  roomId: string;
+  team: string;
+  members: number;
+  productId: number;
+  guesses: number[];
+};
+
 export default function GuessPrice() {
   const router = useRouter();
   const params = useParams();
@@ -10,26 +18,22 @@ export default function GuessPrice() {
   const members = Number(searchParams.get("members") || 1);
   const current = Number(searchParams.get("current") || 1);
   const team = searchParams.get("team") || "A"; // チーム名をクエリから取得（なければ"A"）
+  const productId = 1; // 仮に商品IDを1とする
 
   // JSON形式で保存・取得
-  const [inputData, setInputData] = useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(`guess_input_${roomId}_${team}`);
-      return saved
-        ? JSON.parse(saved)
-        : {
-            roomId,
-            team,
-            number: members,
-            guesses: [],
-          };
-    }
-    return {
+  const [inputData, setInputData] = useState<InputData>(() => {
+    const data: InputData = {
       roomId,
       team,
-      number: members,
+      members,
+      productId,
       guesses: [],
     };
+    if (typeof window !== "undefined") {
+      const storageData = localStorage.getItem(`guess_input_${roomId}_${team}`);
+      return storageData ? JSON.parse(storageData) : data;
+    }
+    return data;
   });
   const [price, setPrice] = useState("");
 
@@ -54,7 +58,7 @@ export default function GuessPrice() {
     // 入力データを更新
     const nextGuesses = [...inputData.guesses];
     nextGuesses[current - 1] = Number(price);
-    setInputData({ guesses: nextGuesses });
+    setInputData({ roomId, team, members, productId, guesses: nextGuesses });
 
     if (current < members) {
       // 次の人の入力ページへ
@@ -64,13 +68,22 @@ export default function GuessPrice() {
         }&team=${team}`
       );
     } else {
+      // 全員分入力が終わったら結果ページへ
+
+      // 価格予想をバックエンドに送信
+      await fetch("http://localhost:8080/api/guess-price", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(inputData),
+      });
+
       // 全員分入力が終わったら「待機ページ」へ遷移し、完了フラグを送信
       await fetch("http://localhost:8080/api/finish-guess", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roomId, team }),
       });
-      router.push(`/wait/${roomId}/${team}`);
+      router.push(`/wait/${roomId}/${team}?productId=${productId}`);
     }
   };
 
