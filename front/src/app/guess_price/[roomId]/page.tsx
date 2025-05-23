@@ -32,7 +32,6 @@ export default function GuessPrice() {
     };
   });
   const [price, setPrice] = useState("");
-  const [inputData, setInputData] = useState<{ guesses: number[] }>({ guesses: [] }); // ← 追加
 
   // ページ切り替え時に入力欄を初期化
   useEffect(() => {
@@ -51,14 +50,6 @@ export default function GuessPrice() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const nextGuesses = [...inputData.guesses];
-    nextGuesses[current - 1] = Number(price);
-
-    const newInputData = {
-      ...inputData,
-      guesses: nextGuesses,
-    };
-    setInputData(newInputData);
 
     // 入力データを更新
     const nextGuesses = [...inputData.guesses];
@@ -67,7 +58,11 @@ export default function GuessPrice() {
 
     if (current < members) {
       // 次の人の入力ページへ
-      router.replace(`/guess_price/${roomId}?members=${members}&current=${current + 1}&team=${team}`);
+      router.replace(
+        `/guess_price/${roomId}?members=${members}&current=${
+          current + 1
+        }&team=${team}`
+      );
     } else {
       // 全員分入力が終わったら「待機ページ」へ遷移し、完了フラグを送信
       await fetch("http://localhost:8080/api/finish-guess", {
@@ -82,12 +77,15 @@ export default function GuessPrice() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 gap-8">
       <h1 className="text-2xl font-bold mb-4">{current}人目の小売価格予想</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 items-center">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4 items-center"
+      >
         <input
           type="number"
           min={1}
           value={price}
-          onChange={e => setPrice(e.target.value)}
+          onChange={(e) => setPrice(e.target.value)}
           className="border rounded px-2 py-1 w-32 text-center"
           placeholder="予想価格（円）"
         />
