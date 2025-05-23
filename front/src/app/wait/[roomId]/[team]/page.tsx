@@ -8,6 +8,7 @@ export default function WaitPage() {
   const params = useParams();
   const roomId = params.roomId as string;
   const team = params.team as string;
+  const members = Number(searchParams.get("members") || 1);
   const productId = Number(searchParams.get("productId"));
 
   useEffect(() => {
@@ -20,7 +21,9 @@ export default function WaitPage() {
       if (res.ok) {
         const data = await res.json();
         if (data.bothFinished) {
-          router.push(`/result/${roomId}?team=${team}&productId=${productId}`);
+          router.push(
+            `/result/${roomId}?team=${team}&members=${members}&productId=${productId}`
+          );
         }
       }
     }, 2000);
