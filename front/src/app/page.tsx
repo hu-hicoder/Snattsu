@@ -8,17 +8,17 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  // ランダムID生成
-  const generateRoomId = () => {
-    const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let id = "";
-    for (let i = 0; i < 6; i++) {
-      id += charset[Math.floor(Math.random() * charset.length)];
-    }
-    return id;
-  };
+  // // ランダムID生成
+  // const generateRoomId = () => {
+  //   const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  //   let id = "";
+  //   for (let i = 0; i < 6; i++) {
+  //     id += charset[Math.floor(Math.random() * charset.length)];
+  //   }
+  //   return id;
+  // };
 
-  // 自動生成で作成
+  // ランダムIDで作成
   const handleAutoCreate = async () => {
     setError(null);
     const res = await fetch("http://localhost:8080/api/create-room", {
