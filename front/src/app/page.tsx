@@ -131,7 +131,6 @@ export default function Home() {
             )}
           </div>
         </section>
-        {/* ...既存の説明リストやリンク... */}
       </main>
     </div>
   );

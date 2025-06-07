@@ -23,6 +23,7 @@ export default function SetSnacks() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 gap-8">
       <h1 className="text-2xl font-bold mb-4">派閥名を入力</h1>
+      <div className="mb-2 text-gray-600">ルームID: <span className="font-mono">{roomId}</span></div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 items-center">
         <input
           type="text"
