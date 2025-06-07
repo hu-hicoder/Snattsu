@@ -79,18 +79,13 @@ export default function WaitPage() {
   };
 
   const [hoverDescription, setHoverDescription] = useState<string | null>(null);
-  const [visible, setVisible] = useState(false);
   const showDescription = (desc: string) => {
     setHoverDescription(desc);
-    setVisible(true);
   };
 
   const hideDescription = () => {
     // 遅延フェードアウトさせる
-    setVisible(false);
-    setTimeout(() => {
-      setHoverDescription(null);
-    }, 300); // フェードアウト後に説明文を削除
+    setHoverDescription(null);
   };
 
   if (!cards) {
@@ -103,9 +98,9 @@ export default function WaitPage() {
         相手チームの入力を待っています…
       </h2>
 
-      <div>
+      <div className="relative">
         <p className="text-lg">スペシャルカードを使用する</p>
-        <div className="flex flex-row gap-5 items-center justify-center ">
+        <div className="flex flex-row gap-5 items-center justify-center">
           {Object.entries(cards).map(([key, card]) => (
             <button
               key={key}
@@ -114,23 +109,19 @@ export default function WaitPage() {
               onMouseLeave={() => hideDescription()}
               style={{ marginRight: "10px" }}
               disabled={usedCard !== false}
-              className="bg-green-300 rounded-xl p-1 text-xl text-gray-900 disabled:bg-green-50 disabled:text-gray-500"
+              className="peer bg-green-300 rounded-xl p-1 text-xl text-gray-900 disabled:bg-green-50 disabled:text-gray-500 cursor-pointer"
             >
               {card.name}
             </button>
           ))}
-        </div>
 
-        {hoverDescription && (
           <div
-            className={`absolute left-0 mt-5 p-3 bg-white border rounded shadow text-gray-600
-                        transition-opacity duration-300 z-10 ${
-                          visible ? "opacity-100" : "opacity-0"
-                        }`}
+            className={`absolute bottom-14 left-12 mt-5 p-3 bg-white border rounded shadow text-gray-600
+                        transition-opacity duration-300 z-10 peer-hover:block hidden`}
           >
             <strong>説明:</strong> {hoverDescription}
           </div>
-        )}
+        </div>
 
         {usedCard === true && <p>スペシャルカード{usedCardName}を使用!</p>}
         {usedCard === "used" && <p>既にカードは使用されています。</p>}
