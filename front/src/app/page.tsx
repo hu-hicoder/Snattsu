@@ -8,16 +8,6 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  // // ランダムID生成
-  // const generateRoomId = () => {
-  //   const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  //   let id = "";
-  //   for (let i = 0; i < 6; i++) {
-  //     id += charset[Math.floor(Math.random() * charset.length)];
-  //   }
-  //   return id;
-  // };
-
   // ランダムIDで作成
   const handleAutoCreate = async () => {
     setError(null);
@@ -28,7 +18,7 @@ export default function Home() {
     if (res.ok) {
       const data = await res.json();
       setRoomId(data.roomId); // ← ここで返ってきたIDを使う
-      router.push(`/set_snacks/${data.roomId}`);
+      router.push(`/${data.roomId}/set_snacks/`);
     } else {
       setError("ルーム作成に失敗しました。");
     }
@@ -43,7 +33,7 @@ export default function Home() {
       body: JSON.stringify({ roomId: id }),
     });
     if (res.ok) {
-      router.push(`/set_snacks/${id}`);
+      router.push(`/${id}/set_snacks/`);
     } else if (res.status === 409) {
       setError("ルームIDが重複しました。別のIDを入力してください。");
     } else {
@@ -71,7 +61,7 @@ export default function Home() {
     if (res.ok) {
       const data = await res.json();
       if (data.exists) {
-        router.push(`/set_snacks/${roomId}`); // ここで遷移
+        router.push(`/${roomId}/set_snacks/`); // ここで遷移
       } else {
         setError("そのルームIDは存在しません。");
       }
