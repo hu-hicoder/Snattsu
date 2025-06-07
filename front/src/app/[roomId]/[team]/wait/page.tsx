@@ -34,7 +34,7 @@ export default function WaitPage() {
         const data = await res.json();
         if (data.bothFinished) {
           router.push(
-            `/result/${roomId}?team=${team}&members=${members}&productId=${productId}`
+            `/${roomId}/${team}/result?members=${members}&productId=${productId}`
           );
         }
       }

@@ -17,14 +17,19 @@ export default function SetSnacks() {
     localStorage.setItem(`team_${roomId}`, team);
 
     // 入力したteam名で遷移
-    router.push(`/input_members/${roomId}?team=${encodeURIComponent(team)}`);
+    router.push(`/${roomId}/${encodeURIComponent(team)}/input_members/`);
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 gap-8">
       <h1 className="text-2xl font-bold mb-4">派閥名を入力</h1>
-      <div className="mb-2 text-gray-600">ルームID: <span className="font-mono">{roomId}</span></div>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 items-center">
+      <div className="mb-2 text-gray-600">
+        ルームID: <span className="font-mono">{roomId}</span>
+      </div>
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4 items-center"
+      >
         <input
           type="text"
           className="border rounded px-2 py-1 flex-1"
