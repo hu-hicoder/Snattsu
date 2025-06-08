@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"sync"
+	"time"
 )
 
 type CardRequest struct {
@@ -42,6 +44,25 @@ func (yn CardEnum) String() string {
 // roomId -> team -> finished
 var usedCardStatus = make(map[string]map[string]map[CardEnum]bool)
 
+type TimerRequest struct {
+	RoomID    string `json:"roomId"`
+	ProductID int    `json:"productId"`
+}
+
+type TimerEntry struct {
+	StartTime time.Time
+	Expired   bool
+}
+
+var (
+	// roomId->productId
+	timers   = make(map[string]map[int]*TimerEntry)
+	timersMu sync.Mutex
+)
+
+// カウントダウンの秒数
+const maxTime = 30
+
 func ensureUsedCardMap(roomID, team string) {
 	if _, ok := usedCardStatus[roomID]; !ok {
 		usedCardStatus[roomID] = make(map[string]map[CardEnum]bool)
@@ -73,6 +94,17 @@ func RegisterCardAPI(db *sql.DB) {
 		}
 
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	})
+
+	http.HandleFunc("/api/discuss-timer", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Methods", "POST")
+
+		if r.Method == http.MethodPost {
+			countDown(w, r)
+			return
+		}
 	})
 }
 
@@ -157,4 +189,63 @@ func methodPost(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func ensureUsedCountDownMap(roomID string) {
+	if _, ok := timers[roomID]; !ok {
+		timers[roomID] = make(map[int]*TimerEntry)
+	}
+}
+
+// カウントダウン
+func countDown(w http.ResponseWriter, r *http.Request) {
+	var req TimerRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	ensureUsedCountDownMap(req.RoomID)
+	now := time.Now()
+
+	timersMu.Lock()
+	timer, exists := timers[req.RoomID][req.ProductID]
+
+	if !exists {
+		// 初回アクセス → タイマー開始
+		timers[req.RoomID][req.ProductID] = &TimerEntry{
+			StartTime: now,
+			Expired:   false,
+		}
+		// ゴルーチンで30秒後にExpiredをtrueに
+		go func(id string, id2 int) {
+			time.Sleep(maxTime * time.Second)
+			timersMu.Lock()
+			if t, ok := timers[id][id2]; ok {
+				t.Expired = true
+			}
+			timersMu.Unlock()
+		}(req.RoomID, req.ProductID)
+		timer = timers[req.RoomID][req.ProductID]
+	}
+	timersMu.Unlock()
+
+	// 残り時間計算
+	var remaining int
+	if timer.Expired {
+		remaining = 0
+	} else {
+		elapsed := int(time.Since(timer.StartTime).Seconds())
+		remaining = maxTime - elapsed
+		if remaining < 0 {
+			remaining = 0
+		}
+	}
+
+	resp := map[string]interface{}{
+		"remaining": remaining,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
 }
