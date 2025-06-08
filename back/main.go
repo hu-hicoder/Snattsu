@@ -24,6 +24,7 @@ func main() {
 	api.RegisterSyncAPI()
 	api.RegisterCardAPI(db)
 	api.RegisterResultAPI(db)
+	api.RegisterSearchAPI()
 
 	fmt.Println("Starting server on :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
