@@ -7,17 +7,15 @@ export default function InputMembers() {
   const params = useParams();
   const searchParams = useSearchParams();
   const roomId = params.roomId as string;
+  const team = params.team as string;
   const [members, setMembers] = useState(2);
   const productId = Number(searchParams.get("productId")) || 1; // チーム名をクエリから取得（なければ"A"）
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // 必要ならバックエンドに人数を保存
-    const team = searchParams.get("team") || "A"; // チーム名をクエリから取得（なければ"A"）
     router.push(
-      `/guess_price/${roomId}?members=${members}&current=1&team=${encodeURIComponent(
-        team
-      )}&productId=${productId}`
+      `/${roomId}/${team}/guess_price/?members=${members}&current=1&productId=${productId}`
     );
   };
 

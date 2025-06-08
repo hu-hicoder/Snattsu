@@ -19,7 +19,7 @@ export default function Result() {
   const params = useParams();
   const searchParams = useSearchParams();
   const roomId = params.roomId as string;
-  const team = searchParams.get("team") || "A";
+  const team = params.team as string;
   const members = Number(searchParams.get("members") || 1);
   const productId = Number(searchParams.get("productId"));
 
@@ -61,7 +61,7 @@ export default function Result() {
         setTimeout(() => {
           const nextProductId = productId + 1;
           router.push(
-            `/guess_price/${roomId}/?members=${members}&current=1&team=${team}&productId=${nextProductId}`
+            `/${roomId}/${team}/guess_price/?members=${members}&current=1&productId=${nextProductId}`
           );
         }, 10000);
       } catch (error) {

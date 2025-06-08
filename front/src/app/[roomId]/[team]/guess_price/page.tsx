@@ -15,10 +15,10 @@ export default function GuessPrice() {
   const params = useParams();
   const searchParams = useSearchParams();
   const roomId = params.roomId as string;
+  const team = params.team as string;
   const members = Number(searchParams.get("members") || 1);
   const current = Number(searchParams.get("current") || 1);
-  const team = searchParams.get("team") || "A"; // チーム名をクエリから取得（なければ"A"）
-  const productId = Number(searchParams.get("productId")) || 1; // チーム名をクエリから取得（なければ"A"）
+  const productId = Number(searchParams.get("productId")) || 1; // チーム名をクエリから取得（なければ1）
 
   // JSON形式で保存・取得
   const [inputData, setInputData] = useState<InputData>(() => {
@@ -63,9 +63,11 @@ export default function GuessPrice() {
     if (current < members) {
       // 次の人の入力ページへ
       router.replace(
-        `/guess_price/${roomId}?members=${members}&current=${
+        `/${roomId}/${encodeURIComponent(
+          team
+        )}/guess_price/?members=${members}&current=${
           current + 1
-        }&team=${team}&productId=${productId}`
+        }&productId=${productId}`
       );
     } else {
       // 全員分入力が終わったら結果ページへ
@@ -84,7 +86,7 @@ export default function GuessPrice() {
         body: JSON.stringify({ roomId, team }),
       });
       router.push(
-        `/wait/${roomId}/${team}?members=${members}&productId=${productId}`
+        `/${roomId}/${team}/wait/?members=${members}&productId=${productId}`
       );
     }
   };
