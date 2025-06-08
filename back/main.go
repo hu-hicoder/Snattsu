@@ -7,10 +7,12 @@ import (
 	"time"
 
 	"github.com/hu-hicoder/Snattsu/back/api"
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
+	godotenv.Load(".env")
 
 	db, err := InitDB()
 	if err != nil {

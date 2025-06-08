@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"math/rand"
 	"net/http"
+	"fmt"
 )
 
 type CheckRequest struct {
@@ -60,6 +61,7 @@ func RegisterRoomAPI(db *sql.DB) {
 			http.Error(w, "failed to create room", http.StatusInternalServerError)
 			return
 		}
+		fmt.Printf("Created room with ID: %s\n", roomID)
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{"roomId": roomID})
