@@ -1,0 +1,45 @@
+{
+    // IntelliSense を使用して利用可能な属性を学べます。
+    // 既存の属性の説明をホバーして表示します。
+    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "FastAPI",
+            "type": "python",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "main:app",
+                "--reload",
+                "--port", "8080"
+            ],
+            "cwd": "${workspaceFolder}/back",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Next.js 3000",
+            "type": "pwa-node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/front",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev"],
+            "port": 3000
+        },
+        {
+            "name": "Next.js 4000",
+            "type": "pwa-node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/front",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev", "--", "-p", "4000"],
+            "port": 4000
+        }
+    ],
+    "compounds": [
+        {
+            "name": "FastAPI & Next.js 3000 & Next.js 4000",
+            "configurations": ["FastAPI", "Next.js 3000", "Next.js 4000"]
+        }
+    ]
+}
