@@ -1,26 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* お菓子テーマのパステルカラー */
+  --background: #FFF5F5;
+  --foreground: #5A3E36;
+  --primary: #FF9494;
+  --primary-hover: #FF7676;
+  --secondary: #FFD1D1;
+  --accent: #FFC7C7;
+  --accent-hover: #FFABAB;
+  --success: #AED9A7;
+  --success-hover: #8BC485;
+  --info: #B5E2FA;
+  --info-hover: #89CFF0;
+  --warning: #FFE3AA;
+  --warning-hover: #FFD580;
+  --card-bg: #FFFFFF;
+  --card-border: #FFE5E5;
+  --input-border: #FFD1D1;
+  --input-bg: #FFFFFF;
+  --button-text: #FFFFFF;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: 'Quicksand', var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #2D2424;
+    --foreground: #F5E8E8;
+    --primary: #FF9494;
+    --primary-hover: #FF7676;
+    --secondary: #5E4444;
+    --accent: #FFC7C7;
+    --accent-hover: #FFABAB;
+    --success: #8BC485;
+    --success-hover: #6DAA67;
+    --info: #89CFF0;
+    --info-hover: #5DADE2;
+    --warning: #FFD580;
+    --warning-hover: #FFC44D;
+    --card-bg: #3F3232;
+    --card-border: #5E4444;
+    --input-border: #5E4444;
+    --input-bg: #2D2424;
+    --button-text: #FFFFFF;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Quicksand', 'Poppins', sans-serif;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(255, 209, 209, 0.1) 10px, transparent 10px),
+    radial-gradient(circle at 90% 30%, rgba(255, 199, 199, 0.1) 15px, transparent 15px),
+    radial-gradient(circle at 30% 70%, rgba(255, 148, 148, 0.1) 8px, transparent 8px),
+    radial-gradient(circle at 80% 80%, rgba(255, 209, 209, 0.1) 12px, transparent 12px);
+  background-size: 200px 200px;
+  background-attachment: fixed;
+}
+
+/* カスタムボタンスタイル */
+.btn-primary {
+  @apply bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--button-text)] rounded-full px-6 py-2.5 font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+}
+
+.btn-secondary {
+  @apply bg-[var(--secondary)] hover:bg-[var(--accent)] text-[var(--foreground)] rounded-full px-6 py-2.5 font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+}
+
+.btn-success {
+  @apply bg-[var(--success)] hover:bg-[var(--success-hover)] text-[var(--button-text)] rounded-full px-6 py-2.5 font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+}
+
+/* カスタム入力フィールドスタイル */
+.input-candy {
+  @apply border-2 border-[var(--input-border)] bg-[var(--input-bg)] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition-all duration-300;
+}
+
+/* カスタムカードスタイル */
+.card-candy {
+  @apply bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl shadow-lg p-6 transition-all duration-300;
+}
+
+/* 見出しスタイル */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold;
+}
+
+h1 {
+  @apply text-3xl md:text-4xl;
+}
+
+h2 {
+  @apply text-2xl md:text-3xl;
+}
+
+/* アニメーション */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }

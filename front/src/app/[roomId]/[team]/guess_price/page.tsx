@@ -93,27 +93,60 @@ export default function GuessPrice() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 gap-8">
-      <h1 className="text-2xl font-bold mb-4">{current}人目の小売価格予想</h1>
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col gap-4 items-center"
-      >
-        <input
-          type="number"
-          min={1}
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          className="border rounded px-2 py-1 w-32 text-center"
-          placeholder="予想価格（円）"
-        />
-        <button
-          type="submit"
-          className="bg-green-600 text-white rounded px-4 py-2 font-semibold hover:bg-green-700 transition"
-          disabled={!price}
+      <div className="text-center mb-2 animate-float">
+        <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">{current}人目の小売価格予想</h1>
+        <p className="text-[var(--foreground)] opacity-80">
+          チーム「{decodeURIComponent(team)}」の{current}/{members}人目
+        </p>
+      </div>
+      
+      <div className="card-candy w-full max-w-md">
+        <div className="mb-6 text-center">
+          <span className="inline-block bg-[var(--secondary)] text-[var(--foreground)] px-4 py-1.5 rounded-full text-sm font-medium">
+            商品 #{productId}
+          </span>
+        </div>
+        
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-5 items-center"
         >
-          決定
-        </button>
-      </form>
+          <div className="w-full relative">
+            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--foreground)] opacity-70">
+              ¥
+            </div>
+            <input
+              type="number"
+              min={1}
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="input-candy w-full text-center text-2xl font-bold pl-8"
+              placeholder="予想価格"
+            />
+            {price && (
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[var(--foreground)] opacity-70">
+                円
+              </div>
+            )}
+          </div>
+          
+          <div className="text-center text-[var(--foreground)] opacity-80 my-2">
+            お菓子の小売価格をズバリ予想！
+          </div>
+          
+          <button
+            type="submit"
+            className="btn-primary w-full mt-2"
+            disabled={!price}
+          >
+            決定
+          </button>
+        </form>
+      </div>
+      
+      <div className="text-center text-sm text-[var(--foreground)] opacity-60 mt-4">
+        他のメンバーには見せないでください
+      </div>
     </div>
   );
 }

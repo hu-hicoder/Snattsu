@@ -71,21 +71,37 @@ export default function Home() {
   };
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <section className="w-full max-w-md bg-white dark:bg-gray-900 rounded-lg shadow p-6 mb-8">
-          <h2 className="text-lg font-bold mb-4 text-center">ルームに参加</h2>
-          <div className="flex flex-col gap-4">
+    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
+      <main className="flex flex-col gap-[32px] row-start-2 items-center w-full max-w-md">
+        <div className="text-center mb-6 animate-float">
+          <h1 className="text-4xl font-bold text-[var(--foreground)] mb-2">Snattsu</h1>
+          <p className="text-lg text-[var(--foreground)] opacity-80">お菓子の価格を当てよう！</p>
+        </div>
+        
+        <section className="card-candy w-full">
+          <h2 className="text-2xl font-bold mb-6 text-center text-[var(--foreground)]">ルームに参加</h2>
+          <div className="flex flex-col gap-5">
             <button
-              className="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition"
+              className="btn-primary w-full flex items-center justify-center gap-2"
               onClick={handleAutoCreate}
             >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+              </svg>
               ランダムIDで作成
             </button>
-            <form onSubmit={handleManualCreate} className="flex gap-2">
+            
+            <div className="relative">
+              <p className="absolute -top-3 left-4 bg-[var(--card-bg)] px-2 text-sm text-[var(--foreground)] opacity-70">
+                または
+              </p>
+              <div className="border-t border-[var(--card-border)] my-4"></div>
+            </div>
+            
+            <form onSubmit={handleManualCreate} className="flex gap-3">
               <input
                 type="text"
-                className="border rounded px-2 py-1 flex-1"
+                className="input-candy flex-1"
                 placeholder="ルームIDを入力"
                 value={roomId}
                 onChange={(e) => setRoomId(e.target.value.toUpperCase())}
@@ -94,15 +110,16 @@ export default function Home() {
               />
               <button
                 type="submit"
-                className="bg-green-600 text-white rounded px-4 py-1 font-semibold hover:bg-green-700 transition"
+                className="btn-success"
               >
-                このIDで作成
+                作成
               </button>
             </form>
-            <form onSubmit={handleJoinRoom} className="flex gap-2">
+            
+            <form onSubmit={handleJoinRoom} className="flex gap-3">
               <input
                 type="text"
-                className="border rounded px-2 py-1 flex-1"
+                className="input-candy flex-1"
                 placeholder="ルームIDを入力"
                 value={roomId}
                 onChange={(e) => setRoomId(e.target.value.toUpperCase())}
@@ -111,16 +128,23 @@ export default function Home() {
               />
               <button
                 type="submit"
-                className="bg-green-600 text-white rounded px-4 py-1 font-semibold hover:bg-green-700 transition"
+                className="btn-secondary"
               >
                 参加
               </button>
             </form>
+            
             {error && (
-              <div className="text-red-600 text-center mt-2">{error}</div>
+              <div className="bg-red-100 text-red-600 p-3 rounded-xl text-center mt-2 animate-pulse">
+                {error}
+              </div>
             )}
           </div>
         </section>
+        
+        <div className="text-center text-sm text-[var(--foreground)] opacity-60 mt-4">
+          お菓子の価格を予想して楽しもう！
+        </div>
       </main>
     </div>
   );
