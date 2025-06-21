@@ -32,6 +32,12 @@ def init_db():
                 id INTEGER PRIMARY KEY,
                 price INTEGER NOT NULL
             )""")
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS snack_prices (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                snack TEXT UNIQUE,
+                price INTEGER NOT NULL
+            )""")
         # test data
         db.execute("INSERT OR IGNORE INTO prices (id, price) VALUES (1, 100)")
         db.commit()
