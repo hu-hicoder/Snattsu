@@ -22,29 +22,52 @@ export default function SetSnacks() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 gap-8">
-      <h1 className="text-2xl font-bold mb-4">派閥名を入力</h1>
-      <div className="mb-2 text-gray-600">
-        ルームID: <span className="font-mono">{roomId}</span>
+      <div className="text-center mb-2 animate-float">
+        <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">派閥名を入力</h1>
+        <p className="text-[var(--foreground)] opacity-80">あなたのチーム名を決めましょう</p>
       </div>
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col gap-4 items-center"
-      >
-        <input
-          type="text"
-          className="border rounded px-2 py-1 flex-1"
-          placeholder="派閥名を入力"
-          value={team}
-          onChange={(e) => setTeam(e.target.value)}
-        />
-        <button
-          type="submit"
-          className="bg-green-600 text-white rounded px-4 py-2 font-semibold hover:bg-green-700 transition"
-          disabled={!team.trim()}
+      
+      <div className="card-candy w-full max-w-md">
+        <div className="mb-6 text-center">
+          <span className="inline-block bg-[var(--secondary)] text-[var(--foreground)] px-4 py-1.5 rounded-full text-sm font-medium">
+            ルームID: <span className="font-mono font-bold">{roomId}</span>
+          </span>
+        </div>
+        
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-5 items-center"
         >
-          次へ
-        </button>
-      </form>
+          <div className="w-full relative">
+            <input
+              type="text"
+              className="input-candy w-full text-center text-lg"
+              placeholder="派閥名を入力"
+              value={team}
+              onChange={(e) => setTeam(e.target.value)}
+            />
+            {team && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[var(--primary)]">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+            )}
+          </div>
+          
+          <button
+            type="submit"
+            className="btn-primary w-full mt-2"
+            disabled={!team.trim()}
+          >
+            次へ
+          </button>
+        </form>
+      </div>
+      
+      <div className="text-center text-sm text-[var(--foreground)] opacity-60 mt-4">
+        チーム名はゲーム中に表示されます
+      </div>
     </div>
   );
 }

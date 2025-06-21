@@ -33,14 +33,42 @@ export default function WaitPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 gap-8">
-      <h2 className="text-xl font-bold mb-4">
-        相手チームの入力を待っています…
-      </h2>
-
-      <div>
-        <p>ルームID: {roomId}</p>
-        <p>あなたのチーム: {decodeURIComponent(team)}</p>
+      <div className="text-center mb-2 animate-float">
+        <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">待機中...</h1>
+        <p className="text-[var(--foreground)] opacity-80">相手チームの入力を待っています</p>
       </div>
+      
+      <div className="card-candy w-full max-w-md">
+        <div className="flex flex-col items-center gap-6">
+          <div className="flex flex-col gap-2 items-center">
+            <span className="inline-block bg-[var(--secondary)] text-[var(--foreground)] px-4 py-1.5 rounded-full text-sm font-medium">
+              ルームID: <span className="font-mono font-bold">{roomId}</span>
+            </span>
+            
+            <span className="inline-block bg-[var(--accent)] text-[var(--foreground)] px-4 py-1.5 rounded-full text-sm font-medium">
+              チーム: <span className="font-bold">{decodeURIComponent(team)}</span>
+            </span>
+          </div>
+          
+          <div className="w-16 h-16 relative animate-spin-slow">
+            <div className="w-full h-full rounded-full border-4 border-t-[var(--primary)] border-r-[var(--secondary)] border-b-[var(--accent)] border-l-[var(--primary-hover)] opacity-75"></div>
+          </div>
+          
+          <p className="text-center text-[var(--foreground)] opacity-80">
+            もうしばらくお待ちください...
+          </p>
+        </div>
+      </div>
+      
+      <style jsx>{`
+        @keyframes spin-slow {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 3s linear infinite;
+        }
+      `}</style>
     </div>
   );
 }

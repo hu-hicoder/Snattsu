@@ -101,35 +101,71 @@ export default function DiscussPage() {
   }
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen gap-8">
-      <p>正解発表まで: {remaining}</p>
-      <div className="relative">
-        <p className="text-lg text-center pb-3">スペシャルカードを使用する</p>
-        <div className="flex flex-row gap-5 items-center justify-center">
-          {Object.entries(cards).map(([key, card]) => (
-            <button
-              key={key}
-              onClick={() => useSpecialCard(key)}
-              onMouseEnter={() => showDescription(card.description)}
-              onMouseLeave={() => hideDescription()}
-              style={{ marginRight: "10px" }}
-              disabled={usedCard !== false}
-              className="peer bg-green-300 rounded-xl p-1 text-xl text-gray-900 disabled:bg-green-50 disabled:text-gray-500 cursor-pointer"
-            >
-              {card.name}
-            </button>
-          ))}
-
-          <div
-            className={`absolute bottom-14 left-12 mt-5 p-3 bg-white border rounded shadow text-gray-600
-                        transition-opacity duration-300 z-10 peer-hover:block hidden`}
-          >
-            <strong>説明:</strong> {hoverDescription}
+    <div className="relative flex flex-col items-center justify-center min-h-screen p-8 gap-8">
+      <div className="text-center mb-2 animate-float">
+        <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">ディスカッションタイム</h1>
+        <p className="text-[var(--foreground)] opacity-80">チーム「{decodeURIComponent(team)}」の作戦会議</p>
+      </div>
+      
+      <div className="card-candy w-full max-w-md">
+        <div className="flex flex-col items-center gap-6">
+          <div className="w-24 h-24 rounded-full bg-[var(--secondary)] flex items-center justify-center border-4 border-[var(--accent)] shadow-lg">
+            <span className="text-3xl font-bold text-[var(--foreground)]">{remaining}</span>
+          </div>
+          
+          <p className="text-center text-[var(--foreground)] font-medium">
+            正解発表までの残り時間
+          </p>
+          
+          <div className="w-full border-t border-[var(--card-border)] my-2"></div>
+          
+          <div className="w-full">
+            <p className="text-lg text-center font-bold text-[var(--foreground)] mb-4">スペシャルカード</p>
+            
+            <div className="grid grid-cols-2 gap-4 w-full">
+              {Object.entries(cards).map(([key, card]) => (
+                <button
+                  key={key}
+                  onClick={() => useSpecialCard(key)}
+                  onMouseEnter={() => showDescription(card.description)}
+                  onMouseLeave={() => hideDescription()}
+                  disabled={usedCard !== false}
+                  className="relative group"
+                >
+                  <div className={`
+                    p-3 rounded-2xl text-center transition-all duration-300 transform
+                    ${usedCard !== false ? 'bg-gray-200 text-gray-400' : 'bg-gradient-to-br from-[var(--accent)] to-[var(--primary)] text-white shadow-md hover:shadow-lg hover:-translate-y-1'}
+                  `}>
+                    <div className="font-bold text-lg mb-1">{card.name}</div>
+                    <div className="text-xs opacity-80">タップして使用</div>
+                  </div>
+                  
+                  <div className="absolute opacity-0 group-hover:opacity-100 bottom-full left-0 right-0 mb-2 p-3 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-[var(--foreground)] text-sm transition-opacity duration-200 z-10">
+                    <div className="font-bold mb-1">{card.name}</div>
+                    <div>{card.description}</div>
+                    <div className="absolute bottom-[-8px] left-1/2 transform -translate-x-1/2 w-4 h-4 rotate-45 bg-white dark:bg-gray-800"></div>
+                  </div>
+                </button>
+              ))}
+            </div>
+            
+            {usedCard === true && (
+              <div className="mt-4 p-3 bg-[var(--success)] bg-opacity-20 rounded-xl text-center text-[var(--foreground)] animate-pulse">
+                <span className="font-bold">スペシャルカード「{usedCardName}」</span>を使用しました！
+              </div>
+            )}
+            
+            {usedCard === "used" && (
+              <div className="mt-4 p-3 bg-red-100 rounded-xl text-center text-red-600">
+                既にカードは使用されています
+              </div>
+            )}
           </div>
         </div>
-
-        {usedCard === true && <p>スペシャルカード{usedCardName}を使用!</p>}
-        {usedCard === "used" && <p>既にカードは使用されています。</p>}
+      </div>
+      
+      <div className="text-center text-sm text-[var(--foreground)] opacity-60 mt-4">
+        チームで相談して、スペシャルカードを使うか決めましょう
       </div>
     </div>
   );

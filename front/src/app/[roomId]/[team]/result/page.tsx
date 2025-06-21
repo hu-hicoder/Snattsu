@@ -82,32 +82,77 @@ export default function Result() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-md text-center">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">結果</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen p-8 gap-8">
+      <div className="text-center mb-2 animate-float">
+        <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">結果発表</h1>
+        <p className="text-[var(--foreground)] opacity-80">お菓子の価格予想対決</p>
+      </div>
+      
+      <div className="card-candy w-full max-w-md">
         {data ? (
-          <>
-            <p className="text-gray-600 text-lg">
-              Winner:{" "}
-              <span className="font-semibold">{data.winner.join()}</span>
-            </p>
-            <p className="text-gray-600 text-lg">
-              チーム <span className="font-semibold">{team}</span> の平均誤差：
-            </p>
-            <p className="text-3xl font-bold text-blue-600 mt-2 mb-4">
-              {data.averageError.toFixed(2)}
-            </p>
+          <div className="flex flex-col items-center gap-6">
+            <div className="w-full">
+              <div className="text-center mb-6">
+                <div className="inline-block bg-[var(--warning)] text-[var(--foreground)] px-6 py-2 rounded-full text-lg font-bold mb-2">
+                  勝者: {data.winner.join(', ')}
+                </div>
+                
+                {data.winner.includes(decodeURIComponent(team)) && (
+                  <div className="mt-2">
+                    <div className="animate-float inline-block">
+                      <span className="text-4xl">🎉</span>
+                    </div>
+                    <p className="text-[var(--foreground)] font-bold mt-1">おめでとうございます！</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="bg-[var(--secondary)] bg-opacity-30 rounded-2xl p-5 mb-4">
+                <p className="text-[var(--foreground)] text-lg mb-2">
+                  チーム「<span className="font-bold">{decodeURIComponent(team)}</span>」の平均誤差
+                </p>
+                <div className="flex items-center justify-center">
+                  <span className="text-4xl font-bold text-[var(--primary)]">
+                    {data.averageError.toFixed(2)}
+                  </span>
+                  <span className="ml-1 text-[var(--foreground)] opacity-70">円</span>
+                </div>
+              </div>
+            </div>
+            
             <button
               onClick={handleGoHome}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full"
+              className="btn-primary w-full mt-2 flex items-center justify-center gap-2"
             >
-              ホームへ戻る
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+              </svg>
+              次のラウンドへ
             </button>
-          </>
+          </div>
         ) : (
-          <p className="text-gray-500">読み込み中...</p>
+          <div className="flex flex-col items-center py-10">
+            <div className="w-16 h-16 relative animate-spin-slow">
+              <div className="w-full h-full rounded-full border-4 border-t-[var(--primary)] border-r-[var(--secondary)] border-b-[var(--accent)] border-l-[var(--primary-hover)] opacity-75"></div>
+            </div>
+            <p className="text-[var(--foreground)] mt-4">結果を計算中...</p>
+          </div>
         )}
       </div>
+      
+      <div className="text-center text-sm text-[var(--foreground)] opacity-60 mt-4">
+        10秒後に自動的に次のラウンドに進みます
+      </div>
+      
+      <style jsx>{`
+        @keyframes spin-slow {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 3s linear infinite;
+        }
+      `}</style>
     </div>
   );
 }
