@@ -10,7 +10,8 @@ class ResultRequest(BaseModel):
     productId: int
 
 @router.post("/result")
-def get_result(req: ResultRequest):
+async def get_result(req: ResultRequest):
+    print(f"Result request received: {req}")
     db = get_db()
     # latest error
     cur = db.execute(

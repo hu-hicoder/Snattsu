@@ -8,6 +8,7 @@ from api.guess import router as guess_router
 from api.sync import router as sync_router
 from api.card import router as card_router
 from api.result import router as result_router
+from api.search import router as search_router
 
 app = FastAPI()
 app.add_middleware(
@@ -26,6 +27,7 @@ app.include_router(guess_router, prefix="/api")
 app.include_router(sync_router, prefix="/api")
 app.include_router(card_router, prefix="/api")
 app.include_router(result_router, prefix="/api")
+app.include_router(search_router)
 
 if __name__ == "__main__":
     print("Starting server on :8080")
